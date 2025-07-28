@@ -1,6 +1,26 @@
-"use strict"
+"use strict";
 /* -------------------------------------------------------
     NODEJS EXPRESS | CLARUSWAY FullStack Team
 ------------------------------------------------------- */
-const { mongoose } = require('../configs/dbConnection')
+const { mongoose } = require("../configs/dbConnection");
 /* ------------------------------------------------------- */
+const BrandSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    image: {
+      type: String,  
+      trim: true,
+    },
+  },
+  {
+    collection: "brands",
+    timestamps: true,
+  }
+);
+
+const Brand = mongoose.model("Brand", BrandSchema);
