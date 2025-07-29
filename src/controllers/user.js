@@ -3,6 +3,36 @@
     NODEJS EXPRESS | CLARUSWAY FullStack Team
 ------------------------------------------------------- */
 
+const passwordEncrypt = require("../helpers/passwordEncrypt");
+
+const checkUserEmailAndPAssword = function (data) {
+  const isEmailValidated = data.email
+    ? /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email)
+    : true;
+
+  if (isEmailValidated) {
+    const isPasswordValidated = data.password
+      ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(
+          data.password
+        )
+      : true;
+
+    if (isPasswordValidated) {
+      // console.log('Password OK')
+
+      data.password = passwordEncrypt(data.password);
+      
+      return data;
+
+      // this._update.password = data.password
+    } else {
+      throw new Error("Password is not validated.");
+    }
+  } else {
+    throw new Error("Email is not validated.");
+  }
+};
+
 //user Controller
 
 const User = require("../models/user");
@@ -48,7 +78,7 @@ module.exports = {
             }
         */
 
-    const data = await User.create(req.body);
+    const data = await User.create(checkUserEmailAndPAssword(req.body));
     res.status(201).send({
       error: false,
       message: "success",
@@ -84,9 +114,13 @@ module.exports = {
             }
         */
 
-    const data = await User.updateOne({ _id: req.params.id }, req.body, {
-      runValidators: true,
-    });
+    const data = await User.updateOne(
+      { _id: req.params.id },
+      checkUserEmailAndPAssword(req.body),
+      {
+        runValidators: true,
+      }
+    );
     res.status(202).send({
       error: false,
       message: "success",
