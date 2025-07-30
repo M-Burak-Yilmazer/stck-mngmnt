@@ -4,19 +4,19 @@
 ------------------------------------------------------- */
 const router = require('express').Router()
 /* ------------------------------------------------------- */
+// routes/sale:
 
-const sale= require('../controllers/sale')
+const sale = require('../controllers/sale')
+const permissions = require('../middlewares/permissions')
 
-//sale Routes
-router.route("/")
-.get(sale.list)
-.post(sale.create)
-router.route("/:id")
-.get(sale.read)
-.put(sale.update)
-.patch(sale.update)
-.delete(sale.delete) 
+// URL: /sales
 
+router.route('/(:id)?')
+    .post(permissions.isAdmin, sale.create)
+    .get(permissions.isStaff, sale.read)
+    .put(permissions.isAdmin, sale.update)
+    .patch(permissions.isAdmin, sale.update)
+    .delete(permissions.isAdmin, sale.delete)
 
-//!Exporting sale routes
+/* ------------------------------------------------------- */
 module.exports = router

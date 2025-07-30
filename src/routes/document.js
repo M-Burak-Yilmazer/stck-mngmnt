@@ -4,30 +4,30 @@
 ------------------------------------------------------- */
 const router = require('express').Router()
 /* ------------------------------------------------------- */
-// routes/document:
+// routes/category:
 
-// URL: /documents
+const category = require('../controllers/category')
+const permissions = require('../middlewares/permissions')
 
-router.all('/', (req, res) => {
-    res.send({
-        swagger: "/documents/swagger",
-        redoc: "/documents/redoc",
-        json: "/documents/json",
-    })
-})
+// URL: /categories
 
-// JSON:
-router.use('/json', (req, res) => {
-    res.sendFile(`/src/configs/swagger.json`, { root: '.' })
-})
+// router.route('/')
+//     // .get(permissions.isStaff, category.list)
+//     .get(permissions.isStaff, category.read)
+//     .post(permissions.isAdmin, category.create)
 
-// Redoc:
-const redoc = require('redoc-express')
-router.use('/redoc', redoc({ specUrl: '/documents/json', title: 'API Docs' }))
+// router.route('/:id')
+//     .get(permissions.isStaff, category.read)
+//     .put(permissions.isAdmin, category.update)
+//     .patch(permissions.isAdmin, category.update)
+//     .delete(permissions.isAdmin, category.delete)
 
-// Swagger:
-const swaggerUi = require('swagger-ui-express')
-router.use('/swagger', swaggerUi.serve, swaggerUi.setup(require('../configs/swagger.json'), { swaggerOptions: { persistAuthorization: true } }))
+router.route('/(:id)?')
+    .post(permissions.isAdmin, category.create)
+    .get(permissions.isStaff, category.read)
+    .put(permissions.isAdmin, category.update)
+    .patch(permissions.isAdmin, category.update)
+    .delete(permissions.isAdmin, category.delete)
 
 /* ------------------------------------------------------- */
 module.exports = router

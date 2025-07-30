@@ -4,19 +4,19 @@
 ------------------------------------------------------- */
 const router = require('express').Router()
 /* ------------------------------------------------------- */
+// routes/firm:
 
-const firm= require('../controllers/firm')
+const firm = require('../controllers/firm')
+const permissions = require('../middlewares/permissions')
 
-//firm Routes
-router.route("/")
-.get(firm.list)
-.post(firm.create)
-router.route("/:id")
-.get(firm.read)
-.put(firm.update)
-.patch(firm.update)
-.delete(firm.delete) 
+// URL: /firms
 
+router.route('/(:id)?')
+    .post(permissions.isAdmin, firm.create)
+    .get(permissions.isStaff, firm.read)
+    .put(permissions.isAdmin, firm.update)
+    .patch(permissions.isAdmin, firm.update)
+    .delete(permissions.isAdmin, firm.delete)
 
-//!Exporting firm routes
+/* ------------------------------------------------------- */
 module.exports = router
