@@ -3,9 +3,16 @@
     NODEJS EXPRESS | CLARUSWAY FullStack Team
 ------------------------------------------------------- */
 
+//user Controller
+
+const User = require("../models/user");
+const Token = require("../models/token");
+const jwt = require("jsonwebtoken");
 const passwordEncrypt = require("../helpers/passwordEncrypt");
+const { token } = require("morgan");
 
 const checkUserEmailAndPAssword = function (data) {
+  return data
   const isEmailValidated = data.email
     ? /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email)
     : true;
@@ -21,7 +28,7 @@ const checkUserEmailAndPAssword = function (data) {
       // console.log('Password OK')
 
       data.password = passwordEncrypt(data.password);
-      
+
       return data;
 
       // this._update.password = data.password
@@ -32,10 +39,6 @@ const checkUserEmailAndPAssword = function (data) {
     throw new Error("Email is not validated.");
   }
 };
-
-//user Controller
-
-const User = require("../models/user");
 
 module.exports = {
   list: async (req, res) => {
@@ -79,9 +82,26 @@ module.exports = {
         */
 
     const data = await User.create(checkUserEmailAndPAssword(req.body));
+    const tokenData = await Token.create({
+      userId: data._id,
+      token: passwordEncrypt(Date.now() + data._id),
+    });
+    const accessToken = jwt.sign(data.toJSON(), process.env.ACCESS_KEY, {
+      expiresIn: "30m",
+    });
+    const refreshToken = jwt.sign(
+      { _id: data._id, password: data.password },
+      process.env.REFRESH_KEY,
+      {
+        expiresIn: "3d",
+      }
+    );
+
     res.status(201).send({
       error: false,
       message: "success",
+      token: tokenData.token,
+      bearer: { accessToken, refreshToken },  
       data,
     });
   },

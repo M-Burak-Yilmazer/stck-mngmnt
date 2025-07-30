@@ -23,7 +23,12 @@ module.exports = {
             `
         */
 
-    const data = await res.getModelList(Sale);
+    const data = await res.getModelList(Sale, {}, [
+      "userId",
+      "productId",
+
+      "brandId",
+    ]);
     res.status(200).send({
       error: false,
       details: await res.getModelListDetails(Sale),
@@ -43,7 +48,7 @@ module.exports = {
                 }
             }
         */
-
+    req.body.userId = req.user._id; // Set userId from JWT token    
     const data = await Sale.create(req.body);
     res.status(201).send({
       error: false,
@@ -56,7 +61,12 @@ module.exports = {
             #swagger.tags = ["Sales"]
             #swagger.summary = "Get Single Sale"
         */
-    const data = await Sale.findOne({ _id: req.params.id });
+    const data = await Sale.findOne({ _id: req.params.id }).ppopulate([
+      "userId",
+      "productId",
+
+      "brandId",
+    ]);
     res.status(200).send({
       error: false,
       message: "success",

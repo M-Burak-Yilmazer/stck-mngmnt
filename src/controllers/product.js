@@ -6,6 +6,7 @@
 //Product Controller
 
 const Product = require("../models/product");
+const { populate } = require("../models/user");
 
 module.exports = {
   list: async (req, res) => {
@@ -23,7 +24,17 @@ module.exports = {
             `
         */
 
-    const data = await res.getModelList(Product);
+    const data = await res.getModelList(Product, {}, [
+      {
+        path: "brandId",
+        select: "name",
+      },
+      {
+        path: "categoryId",
+        select: "name",
+      },
+    ]);
+
     res.status(200).send({
       error: false,
       details: await res.getModelListDetails(Product),
@@ -56,7 +67,16 @@ module.exports = {
             #swagger.tags = ["Products"]
             #swagger.summary = "Get Single Product"
         */
-    const data = await Product.findOne({ _id: req.params.id });
+    const data = await Product.findOne({ _id: req.params.id }).populate([
+      {
+        path: "brandId",
+        select: "name",
+      },
+      {
+        path: "categoryId",
+        select: "name",
+      },
+    ]);
     res.status(200).send({
       error: false,
       message: "success",
@@ -64,7 +84,7 @@ module.exports = {
     });
   },
   update: async (req, res) => {
-    /*
+    /* 
             #swagger.tags = ["Products"]
             #swagger.summary = "Update Product"
             #swagger.parameters['body'] = {
